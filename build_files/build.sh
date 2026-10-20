@@ -13,6 +13,15 @@ test -f "/usr/lib/modules/${KERNEL_VERSION}/extra/ipts/ipts.ko"
 depmod -a "${KERNEL_VERSION}"
 modinfo -k "${KERNEL_VERSION}" ipts | grep -E '^(filename|signer|alias)'
 
+# Patched mei-me (adds the Ice Lake iTouch PCI ID 8086:34e4). It must beat the
+# stock module, carry the new alias, and be signed.
+test -f "/usr/lib/modules/${KERNEL_VERSION}/updates/mei-me.ko"
+mei_path="$(modinfo -k "${KERNEL_VERSION}" -n mei_me)"
+[[ "$mei_path" == */updates/mei-me.ko ]]
+mei_alias="$(modinfo -k "${KERNEL_VERSION}" -F alias mei_me)"
+grep -qi '34E4' <<<"$mei_alias"
+modinfo -k "${KERNEL_VERSION}" -F signer mei_me
+
 # Trust this image's own cosign key, so updates are verified like Bazzite's.
 python3 - <<'EOF'
 import json

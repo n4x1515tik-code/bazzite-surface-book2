@@ -34,6 +34,9 @@ RUN /builder/build-iptsd.sh
 RUN --mount=type=secret,id=mok_key,required=true \
     --mount=type=secret,id=mok_cert,required=true \
     KERNEL_VERSION=${KERNEL_VERSION} /builder/build-ipts.sh
+RUN --mount=type=secret,id=mok_key,required=true \
+    --mount=type=secret,id=mok_cert,required=true \
+    KERNEL_VERSION=${KERNEL_VERSION} /builder/build-mei-me.sh
 
 # Final image
 FROM ${BASE_IMAGE}
